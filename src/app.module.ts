@@ -1,25 +1,21 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import ConnectDatabase from './config/database'
-import {UserModule} from './User/user.module'
-import { APP_INTERCEPTOR } from '@nestjs/core';
- import { ResponseInterceptor } from './Response/response.interceptor';  
- import { JwtModule } from '@nestjs/jwt';
- import { User } from './User/entity/user.entity';
-
- 
+import { UserModule } from './User/user.module';
+import ConnectDatabase from './config/database';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(ConnectDatabase),UserModule,
-
+  imports: [
+    TypeOrmModule.forRoot(ConnectDatabase),
+    UserModule,
 
     JwtModule.register({
       global: true,
-      secret: "ahmed",
+      secret: 'ahmed',
       signOptions: { expiresIn: '60s' },
     }),
   ],
- 
+
   controllers: [],
   providers: [
     // {

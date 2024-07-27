@@ -1,16 +1,22 @@
 import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
   CallHandler,
+  ExecutionContext,
   HttpException,
   HttpStatus,
+  Injectable,
+  NestInterceptor,
 } from '@nestjs/common';
-import { Observable, tap, catchError } from 'rxjs';
+import { Observable, catchError, tap } from 'rxjs';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> {
+  // !Great Using of interceptor  .
+  // !Comment why using any type ?
+
+  intercept(
+    context: ExecutionContext,
+    next: CallHandler<any>,
+  ): Observable<any> {
     return next.handle().pipe(
       tap((data) => {
         // Format successful responses
@@ -24,7 +30,9 @@ export class ResponseInterceptor implements NestInterceptor {
       catchError((error) => {
         // Handle and format errors
         const statusCode =
-          error instanceof HttpException ? error.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+          error instanceof HttpException
+            ? error.getStatus()
+            : HttpStatus.INTERNAL_SERVER_ERROR;
         const message =
           error instanceof HttpException
             ? error.message
@@ -36,7 +44,11 @@ export class ResponseInterceptor implements NestInterceptor {
         };
 
         return new Observable((observer) => {
-          context.switchToHttp().getResponse().status(statusCode).json(response);
+          context
+            .switchToHttp()
+            .getResponse()
+            .status(statusCode)
+            .json(response);
           observer.complete();
         });
       }),
