@@ -1,28 +1,34 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { UserService } from 'src/User/user.service';
- 
+
+// !Comment  Why didn't use the the guard globally ..?
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userService:UserService
+    private readonly userService: UserService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
     const authHeader = request.headers['authorization'];
-    
+
     if (!authHeader) {
       throw new UnauthorizedException('Authorization header is missing');
     }
     const token = authHeader.replace('Bearer ', '');
-    
+
     try {
       const decoded = this.jwtService.verify(token);
-      
+
       if (!decoded) {
         throw new UnauthorizedException('Invalid token');
       }
@@ -37,5 +43,4 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('Invalid token');
     }
   }
-
 }
